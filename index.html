@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>friendbook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Màn hình Đăng nhập / Đăng ký -->
+  <div id="auth" class="auth-container">
+    <h2>friendbook</h2>
+    <div class="auth-box">
+      <input type="text" id="name" placeholder="Tên hiển thị (chỉ dùng khi đăng ký)">
+      <input type="email" id="email" placeholder="Email của bạn">
+      <input type="password" id="password" placeholder="Mật khẩu">
+      <div class="auth-actions">
+        <button id="login">Đăng nhập</button>
+        <button id="register">Đăng ký</button>
+      </div>
+      <p id="authMsg"></p>
+    </div>
+  </div>
+
+  <!-- Giao diện Ứng dụng chính -->
+  <div id="app" class="hidden">
+    <header class="header">
+      <h1>friendbook</h1>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="who"></span>
+        <button id="logout" class="hidden">Đăng xuất</button>
+      </div>
+    </header>
+
+    <!-- Thanh Menu / Điều hướng các tab -->
+    <nav class="nav">
+      <button data-tab="feed">🏠 Bảng tin</button>
+      <button data-tab="friends">👥 Bạn bè</button>
+      <button data-tab="chat">💬 Nhắn tin</button>
+      <button data-tab="setlove">💖 Set Love</button>
+      <button data-tab="rewards">⭐ Phiếu bé ngoan</button>
+      <button id="adminMobileTab" data-tab="adminTab" class="hidden admin-btn">🛡️ Admin</button>
+    </nav>
+
+    <!-- Các Tab Nội Dung -->
+    <main class="app-main">
+
+      <!-- 1. Tab Bảng tin -->
+      <div id="feed" class="view hidden">
+        <div class="composer">
+          <textarea id="postText" placeholder="Bạn đang nghĩ gì thế?"></textarea>
+          <button id="postBtn">Đăng bài</button>
+        </div>
+        <div id="posts"></div>
+      </div>
+
+      <!-- 2. Tab Bạn bè -->
+      <div id="friends" class="view hidden">
+        <h3>Tìm kiếm bạn bè</h3>
+        <div style="display:flex;gap:8px;margin-bottom:15px;">
+          <input type="text" id="searchFriendInput" placeholder="Nhập tên hoặc email..." style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;">
+          <button id="searchFriendBtn" class="btn-primary btn-sm" style="padding:8px 14px;">Tìm</button>
+        </div>
+        <div id="searchResults" style="margin-bottom:20px;"></div>
+
+        <h3>Lời mời kết bạn</h3>
+        <div id="requests" style="margin-bottom:20px;"></div>
+
+        <h3>Danh sách bạn bè</h3>
+        <div id="myFriends"></div>
+      </div>
+
+      <!-- 3. Tab Nhắn tin (Messenger) -->
+      <div id="chat" class="view hidden chat-view">
+        <div class="chat-header">
+          <h3 style="margin:0;">Messenger</h3>
+          <div>
+            <input type="file" id="chatBgInput" accept="image/*" class="hidden">
+            <button class="icon-btn" onclick="document.getElementById('chatBgInput').click()">🖼️ Đổi hình nền</button>
+          </div>
+        </div>
+
+        <div class="chat-body">
+          <div id="chatFriends"></div>
+          <div id="chatBoxContainer">
+            <div id="chatTitleText">Chọn bạn để chat...</div>
+            <div id="messages"></div>
+            <div class="chat-inputbar">
+              <input type="file" id="imageInput" accept="image/*" class="hidden">
+              <input type="file" id="videoInput" accept="video/*" class="hidden">
+              <button id="attachImageBtn" title="Gửi ảnh">📷</button>
+              <button id="attachVideoBtn" title="Gửi video">🎥</button>
+              <button id="recordVoiceBtn" title="Ghi âm giọng nói">🎙️</button>
+              <input type="text" id="message" placeholder="Nhập tin nhắn...">
+              <button id="sendBtn">Gửi</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Tab Set Love -->
+      <div id="setlove" class="view hidden" style="text-align:center;">
+        <div class="setlove-header">
+          <h2 style="margin:0;">💖 Không Gian Set Love</h2>
+          <div>
+            <input type="file" id="loveBgInput" accept="image/*" class="hidden">
+            <button class="icon-btn love-btn-bg" onclick="document.getElementById('loveBgInput').click()">🖼️ Đổi hình nền</button>
+          </div>
+        </div>
+
+        <div id="setlove-request-section">
+          <p>Chọn 1 người duy nhất để bắt đầu gắn kết tình yêu:</p>
+          <select id="setlovePartnerSelect"></select><br>
+          <button id="sendSetLoveBtn">Gửi lời mời Set Love</button>
+        </div>
+
+        <div id="setlove-active-section" class="hidden">
+          <h3>Đang hẹn hò cùng: <span id="partnerName"></span></h3>
+          <p id="loveTimer"></p>
+
+          <!-- 2 Hũ đựng trái tim -->
+          <div class="jars-row">
+            <div>
+              <p class="jar-label">Hũ của bạn (Tự do tương tác)</p>
+              <div id="myGlassJar" class="glass-jar"></div>
+              <button class="jar-btn remove" onclick="addBrokenHeart('my')">Thả tim 💔</button>
+              <button class="jar-btn calm" onclick="removeBrokenHeart('my')">Xoa dịu 💚</button>
+            </div>
+            <div>
+              <p class="jar-label">Hũ của người ấy (Chỉ xem)</p>
+              <div id="partnerGlassJar" class="glass-jar"></div>
+              <button class="jar-btn remove" onclick="addBrokenHeart('partner')">Thả tim 💔</button>
+              <button class="jar-btn calm" onclick="removeBrokenHeart('partner')">Xoa dịu 💚</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Tab Phiếu bé ngoan -->
+      <div id="rewards" class="view hidden">
+        <h2>⭐ Sổ Thành tích & Phiếu Bé Ngoan</h2>
+        <p>Tổng số phiếu bé ngoan nhận được: <b id="weekCount">0</b></p>
+        <div id="rewardHistory" style="margin-top:15px;"></div>
+      </div>
+
+      <!-- 6. Tab Admin -->
+      <div id="adminTab" class="view hidden">
+        <h2>🛡️ Quản trị viên (Phát Phiếu)</h2>
+        <div class="admin-box">
+          <label>Chọn thành viên:</label>
+          <select id="awardUser"></select>
+
+          <label>Lý do / Nội dung:</label>
+          <input type="text" id="awardReason" placeholder="Ví dụ: Hoàn thành xuất sắc nhiệm vụ...">
+
+          <div class="admin-actions">
+            <button id="awardBtn">Phát Phiếu Bé Ngoan ⭐</button>
+            <button id="awardBadBtn">Phát Phiếu Bé Hư ⚠️</button>
+          </div>
+          <p id="adminMsg"></p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal thông báo khi nhận thưởng -->
+  <div id="badgeModal" class="hidden modal-overlay">
+    <div class="modal-box">
+      <h2>🎉 Chúc mừng!</h2>
+      <p>Bạn vừa nhận được một đánh giá mới từ hệ thống hoặc quản trị viên!</p>
+      <button id="closeModal">Đóng</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
