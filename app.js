@@ -1,6 +1,8 @@
 // ⚠️ Sau khi Deploy code.gs, dán URL /exec vào đây:
-const API_URL = "https://script.google.com/macros/s/AKfycbwRaXYfUBZRNQCmrIKymVikovpx2jZHBFrbHmugVBx3aItD9indwfK1WvvXF8hdrPBiHQ/exec";
-const ADMIN_EMAIL = 'lengocnhu1805@gmail.com';
+const API_URL = "https://script.google.com/macros/s/AKfycbw81S_mxLGU2-t3dA7ywo8GYH15ysnvIeFQ5VlYkTW58ouz1N0UIeZWubv7atLp3a6r6w/exec";
+// Vào web bằng link có thêm ?admin=1 ở cuối (ví dụ: https://...github.io/ten-repo/?admin=1)
+// thì tài khoản vừa đăng nhập sẽ thấy thêm tab Admin, bất kể là email nào.
+const isAdminMode = new URLSearchParams(window.location.search).get('admin') === '1';
 
 let currentUser = null;
 let currentChatUser = null;
@@ -93,7 +95,7 @@ function showMainApp() {
   $('logout').classList.remove('hidden');
   $('who').textContent = `✨ Xin chào, ${currentUser.name || currentUser.email}`;
 
-  if (currentUser.email === ADMIN_EMAIL) {
+  if (isAdminMode) {
     $('adminTab').classList.remove('hidden');
     $('adminMobileTab')?.classList.remove('hidden');
     loadAdminUsers();
